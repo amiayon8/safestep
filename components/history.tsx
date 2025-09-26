@@ -67,7 +67,7 @@ export default function MyMap() {
   return (
     <div>
       {/* Date selector */}
-      <div className="bottom-8 left-2 z-10 absolute bg-white shadow-md rounded cursor-pointer">
+      <div className="bottom-8 left-2 z-10 absolute bg-white shadow-md rounded text-black cursor-pointer">
         <input
           type="date"
           value={selectedDate}
