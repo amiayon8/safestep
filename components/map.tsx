@@ -10,6 +10,30 @@ const containerStyle = {
     height: "100vh",
 };
 
+type GpsData = {
+  id: number;
+  latitude: number;
+  longitude: number;
+  altitude: number | null;
+  speed: number | null;
+  course: number | null;
+  satellites: number | null;
+  hdop: number | null;
+  gps_date: string | null;   // ISO date string
+  gps_time: string | null;   // HH:MM:SS
+  created_at: string;        // ISO timestamp
+};
+
+type SupabasePayload<T> = {
+  commit_timestamp: string;
+  errors: null | unknown;
+  eventType: "INSERT" | "UPDATE" | "DELETE";
+  new: T;
+  old: T | null;
+  schema: string;
+  table: string;
+};
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -30,7 +54,8 @@ export default function MyMap() {
                 "postgres_changes",
                 { event: "INSERT", schema: "public", table: "gps_data" },
                 (payload) => {
-                    const newData = payload.new as any;
+                    console.log("Change received!", payload);
+                    const newData = payload.new as GpsData;
                     if (newData.latitude && newData.longitude) {
                         setPosition({ lat: newData.latitude, lng: newData.longitude });
                         if (newData.course !== null) setHeading(newData.course);
