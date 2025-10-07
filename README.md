@@ -160,9 +160,8 @@ This project combines **IoT innovation** and **real-time cloud integration** to 
 ## 🧑‍💻 Author
 
 **👨‍💻 Sarker Ayon**
-*Full Stack Developer | Student at Rajuk Uttara Model College*
+*Student at Rajuk Uttara Model College*
 🌐 [thenicedev.xyz](https://www.thenicedev.xyz)
-📷 [@amiayon8](https://instagram.com/amiayon8)
 
 ---
 
@@ -173,8 +172,3 @@ This project is licensed under the **MIT License** — feel free to fork, contri
 ---
 
 **SafeStep – A Smarter Path for the Visually Impaired.**
-
-
-Would you like me to make a matching **GitHub repository structure** (folders like `/firmware`, `/dashboard`, `/docs`, `/assets`) and a `.gitignore` for Arduino + Next.js projects?  
-That’ll make it look professional and ready for publishing.
-```
