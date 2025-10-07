@@ -108,7 +108,7 @@ SafeStep is a smart wearable device for **blind or visually impaired users** tha
 
 ### 1. Flash the Firmware
 
-1. Open the `.ino` file in **Arduino IDE** or **PlatformIO**.
+1. Open the `/firmware/SafeStep.ino` file in **Arduino IDE** or **PlatformIO**.
 2. Select **ESP32 Dev Module**.
 3. Install dependencies:
 
