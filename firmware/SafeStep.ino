@@ -24,33 +24,43 @@ const int echoPin = 18;
 const int buzzerPin = 26;
 
 // Distance thresholds (cm)
-const int dangerDist = 15;
-const int closeDist = 30;
-const int mediumDist = 70;
+const int dangerDist = 25;
+const int closeDist = 50;
+const int mediumDist = 80;
 const int farDist = 100;
+
+// ================== Timing Intervals ==================
+const unsigned long distanceInterval = 200;   // every 200ms
+const unsigned long gpsInterval = 50;         // process GPS serial often
+const unsigned long sendInterval = 5000;      // every 5 seconds
+
+// ================== State Variables ==================
+unsigned long lastDistanceMillis = 0;
+unsigned long lastGpsMillis = 0;
+unsigned long lastSendMillis = 0;
+
+long lastDistance = 0;
+unsigned long buzzerTimer = 0;
+bool buzzerOn = false;
+int buzzerPattern = 0;
 
 WiFiClientSecure client;
 
 // ================== Setup ==================
 void setup() {
-  // Serial.begin(115200);
+  Serial.begin(115200);
   SerialGPS.begin(9600, SERIAL_8N1, 16, 17);
 
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(buzzerPin, OUTPUT);
+  noTone(buzzerPin);
 
-  // Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    // Serial.print(".");
-  }
-  // Serial.println("\n✅ Connected to WiFi");
-  client.setInsecure();  // Disable SSL verification (for simplicity)
+  client.setInsecure();
 }
 
-// ================== Measure Distance ==================
+// ================== Non-blocking Distance Measurement ==================
 long measureDistance() {
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -58,13 +68,82 @@ long measureDistance() {
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
 
-  long duration = pulseIn(echoPin, HIGH);
-  long distance = duration * 0.034 / 2;
-  return distance;
+  long duration = pulseIn(echoPin, HIGH, 25000);  // 25ms timeout
+  if (duration == 0) return 999;  // out of range
+  return duration * 0.034 / 2;
+}
+
+// ================== Buzzer Pattern Controller ==================
+void updateBuzzer() {
+  unsigned long now = millis();
+
+  switch (buzzerPattern) {
+    case 0:  // dangerDist (continuous tone)
+      tone(buzzerPin, 1000);
+      break;
+
+    case 1:  // closeDist (beep 100ms on/off)
+      if (now - buzzerTimer >= 100) {
+        buzzerTimer = now;
+        if (buzzerOn) noTone(buzzerPin);
+        else tone(buzzerPin, 1500);
+        buzzerOn = !buzzerOn;
+      }
+      break;
+
+    case 2:  // mediumDist (250ms on, 1s off)
+      if (now - buzzerTimer >= (buzzerOn ? 250 : 1000)) {
+        buzzerTimer = now;
+        if (buzzerOn) noTone(buzzerPin);
+        else tone(buzzerPin, 2000);
+        buzzerOn = !buzzerOn;
+      }
+      break;
+
+    case 3:  // farDist (500ms on, 1.5s off)
+      if (now - buzzerTimer >= (buzzerOn ? 500 : 1500)) {
+        buzzerTimer = now;
+        if (buzzerOn) noTone(buzzerPin);
+        else tone(buzzerPin, 3000);
+        buzzerOn = !buzzerOn;
+      }
+      break;
+
+    case 4:  // idle (off)
+      noTone(buzzerPin);
+      buzzerOn = false;
+      break;
+  }
+}
+
+// ================== Distance Logic ==================
+void handleDistance() {
+  long distance = measureDistance();
+  if (distance != lastDistance) {
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+    lastDistance = distance;
+  }
+
+  if (distance <= dangerDist) buzzerPattern = 0;
+  else if (distance <= closeDist) buzzerPattern = 1;
+  else if (distance <= mediumDist) buzzerPattern = 2;
+  else if (distance <= farDist) buzzerPattern = 3;
+  else buzzerPattern = 4;
+}
+
+// ================== GPS Processing ==================
+void handleGPS() {
+  while (SerialGPS.available() > 0) {
+    gps.encode(SerialGPS.read());
+  }
 }
 
 // ================== Send GPS Data to Supabase ==================
 void sendToSupabase() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
   StaticJsonDocument<256> doc;
   doc["latitude"] = gps.location.lat();
   doc["longitude"] = gps.location.lng();
@@ -72,14 +151,13 @@ void sendToSupabase() {
   doc["speed"] = gps.speed.kmph();
   doc["course"] = gps.course.deg();
   doc["satellites"] = gps.satellites.value();
-  doc["hdop"] = gps.hdop.value() / 100.0;
+  doc["hdop"] = gps.hdop.hdop();
 
   if (gps.date.isValid()) {
     char dateStr[11];
     sprintf(dateStr, "%04d-%02d-%02d", gps.date.year(), gps.date.month(), gps.date.day());
     doc["gps_date"] = dateStr;
   }
-
   if (gps.time.isValid()) {
     char timeStr[9];
     sprintf(timeStr, "%02d:%02d:%02d", gps.time.hour(), gps.time.minute(), gps.time.second());
@@ -89,67 +167,39 @@ void sendToSupabase() {
   String json;
   serializeJson(doc, json);
 
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(client, supabase_url);
-    http.addHeader("Content-Type", "application/json");
-    http.addHeader("apikey", supabase_key);
-    http.addHeader("Authorization", String("Bearer ") + supabase_key);
+  HTTPClient http;
+  http.begin(client, supabase_url);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("apikey", supabase_key);
+  http.addHeader("Authorization", String("Bearer ") + supabase_key);
+  int code = http.POST(json);
+  http.end();
 
-    int httpResponseCode = http.POST(json);
-
-    if (httpResponseCode > 0) {
-      // Serial.print("✅ POST Response: ");
-      // Serial.println(httpResponseCode);
-      // Serial.println(http.getString());
-    } else {
-      // Serial.print("❌ Error sending POST: ");
-      // Serial.println(http.errorToString(httpResponseCode));
-    }
-
-    http.end();
-  } else {
-    // Serial.println("⚠️ WiFi not connected!");
-  }
+  Serial.printf("POST %d\n", code);
 }
 
-// ================== Loop ==================
+// ================== Main Loop ==================
 void loop() {
-  // --------- Distance Measurement ---------
-  long distance = measureDistance();
-  // Serial.print("Distance: ");
-  // Serial.print(distance);
-  // Serial.println(" cm");
+  unsigned long now = millis();
 
-  if (distance <= dangerDist) {
-    tone(buzzerPin, 3500);
-  } else if (distance <= closeDist) {
-    tone(buzzerPin, 3000);
-    delay(100);
-    noTone(buzzerPin);
-    delay(100);
-  } else if (distance > closeDist && distance <= mediumDist) {
-    tone(buzzerPin, 2000);
-    delay(250);
-    noTone(buzzerPin);
-    delay(1000);
-  } else if (distance > mediumDist && distance <= farDist) {
-    tone(buzzerPin, 1000);
-    delay(500);
-    noTone(buzzerPin);
-    delay(1500);
-  } else {
-    noTone(buzzerPin);
-    delay(500);
+  // Periodic distance check
+  if (now - lastDistanceMillis >= distanceInterval) {
+    lastDistanceMillis = now;
+    handleDistance();
   }
 
-  // --------- GPS Reading ---------
-  while (SerialGPS.available() > 0) {
-    gps.encode(SerialGPS.read());
+  // Buzzer runs continuously, state-based
+  updateBuzzer();
+
+  // GPS decode frequently
+  if (now - lastGpsMillis >= gpsInterval) {
+    lastGpsMillis = now;
+    handleGPS();
   }
 
-  // --------- Send to Supabase if new data ---------
-  if (gps.location.isUpdated()) {
+  // Periodic Supabase send
+  if (gps.location.isUpdated() && (now - lastSendMillis >= sendInterval)) {
+    lastSendMillis = now;
     sendToSupabase();
   }
 }
