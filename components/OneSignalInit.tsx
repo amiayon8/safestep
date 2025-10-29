@@ -14,7 +14,7 @@ export default function OneSignalInit() {
                     enable: true,
                     prenotify: true,
                     showCredit: false,
-                    position: "bottom-right",
+                    position: "bottom-left",
                     text: {
                         'dialog.blocked.title': "Notifications Blocked",
                         'dialog.blocked.message': "You've blocked notifications. To stay updated, please enable them in your browser settings.",
