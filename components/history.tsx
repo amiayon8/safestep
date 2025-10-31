@@ -3,21 +3,24 @@
 
 import { useLoadScript, GoogleMap, Marker, Polyline } from "@react-google-maps/api";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import { useTheme } from "next-themes";
+import { Input } from "@/components/ui/input";
+import { LoadingMaps } from "./loading-maps";
 
 const containerStyle = {
   width: "100%",
   height: "100vh",
 };
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default function MyMap() {
+  const supabase = createClient();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   });
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -62,38 +65,43 @@ export default function MyMap() {
     fetchHistory();
   }, [selectedDate]);
 
-  if (!isLoaded) return <p>Loading map...</p>;
+  if (!isLoaded) return <LoadingMaps />;
 
   return (
-    <div>
+    <div className="relative">
       {/* Date selector */}
-      <div className="bottom-8 left-2 z-10 absolute bg-white shadow-md rounded text-black cursor-pointer">
-        <input
+      <div className="bottom-18 left-2 z-10 absolute bg-card rounded-lg cursor-pointer">
+        <Input
+          className="cursor-pointer"
           type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="px-2 py-1 border rounded"
         />
       </div>
 
       <GoogleMap
-        key={selectedDate} // ✅ Force a fresh map render on date change
+        key={selectedDate}
         mapContainerStyle={containerStyle}
         center={center}
-        zoom={15}
+        zoom={20}
         options={{
-          zoomControl: true,
+          zoomControl: false,
           streetViewControl: false,
           fullscreenControl: true,
           mapTypeControl: true,
           mapTypeControlOptions: {
             style: 1,
-            position: 3,
+            position: 1,
             mapTypeIds: ["roadmap", "satellite"],
           },
+          cameraControlOptions: {
+            position: 3,
+          },
+
           rotateControl: false,
           scaleControl: true,
           clickableIcons: true,
+          ...(isDark && { colorScheme: "DARK" }),
         }}
       >
         {/* Draw path if available */}
@@ -115,12 +123,13 @@ export default function MyMap() {
             <Marker
               key={`start-${selectedDate}-${path[0].lat}-${path[0].lng}`}
               position={path[0]}
-              label="Start"
+              label="S"
             />
             <Marker
               key={`end-${selectedDate}-${path[path.length - 1].lat}-${path[path.length - 1].lng}`}
               position={path[path.length - 1]}
-              label="End"
+              label="E"
+              
             />
           </>
         )}

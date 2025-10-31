@@ -3,7 +3,9 @@
 
 import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import { useTheme } from "next-themes";
+import { LoadingMaps } from "./loading-maps";
 
 const containerStyle = {
   width: "100%",
@@ -24,20 +26,20 @@ type GpsData = {
   created_at: string; // ISO timestamp
 };
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default function MyMap() {
+  const supabase = createClient();  
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   });
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const [position, setPosition] = useState({ lat: 23.8103, lng: 90.4125 });
   const [heading, setHeading] = useState(0);
 
   useEffect(() => {
-    // ✅ Fetch last known GPS data first
+    // Fetch last known GPS data first
     const fetchLastPosition = async () => {
       const { data, error } = await supabase
         .from("gps_data")
@@ -57,7 +59,7 @@ export default function MyMap() {
 
     fetchLastPosition();
 
-    // ✅ Subscribe to realtime changes
+    // Subscribe to realtime changes
     const channel = supabase
       .channel("gps_data_changes")
       .on(
@@ -79,7 +81,7 @@ export default function MyMap() {
     };
   }, []);
 
-  if (!isLoaded) return <p>Loading map...</p>;
+  if (!isLoaded) return <LoadingMaps />;
 
   return (
     <GoogleMap
@@ -87,18 +89,23 @@ export default function MyMap() {
       center={position}
       zoom={20}
       options={{
-        zoomControl: true,
+        zoomControl: false,
         streetViewControl: false,
         fullscreenControl: true,
         mapTypeControl: true,
         mapTypeControlOptions: {
           style: 1,
-          position: 3,
+          position: 1,
           mapTypeIds: ["roadmap", "satellite"],
         },
+        cameraControlOptions: {
+          position: 3,
+        },
+        
         rotateControl: false,
         scaleControl: true,
         clickableIcons: true,
+        ...(isDark && { colorScheme: "DARK" }),
       }}
     >
       <Marker

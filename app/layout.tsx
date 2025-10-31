@@ -3,14 +3,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ProgressLoader from "./client"
 import OneSignalInit from "@/components/OneSignalInit";
+import Sidebar from "@/components/sidebar";
+import { ThemeProvider } from "@/app/theme-provider";
+import { Open_Sans } from "next/font/google";
+import { Toaster } from "sonner";
+import Preloader from "@/components/Preloader";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
   subsets: ["latin"],
 });
 
@@ -25,13 +25,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${openSans.variable} antialiased`}
       >
-        <OneSignalInit />
-        <ProgressLoader />
-        {children}
+        <ThemeProvider>
+          <ProgressLoader />
+          <Preloader />
+          <Toaster />
+          <Sidebar>
+            <OneSignalInit />
+            <ProgressLoader />
+            {children}
+          </Sidebar>
+        </ThemeProvider>
       </body>
     </html>
   );
