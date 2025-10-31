@@ -4,7 +4,7 @@ export async function POST(req: Request) {
     try {
         const { key } = await req.json();
 
-        if (!(key === process.env.SOS_API_KEY)) {
+        if (!(key === process.env.SOS_AUTH_SECRET_KEY)) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
