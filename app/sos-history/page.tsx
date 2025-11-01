@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingItems } from "@/components/loading-items";
+import { toast } from "sonner";
 
 type SosData = {
     id: number;
@@ -110,7 +111,7 @@ export default function SosTable() {
 
         // Subscribe to realtime SOS inserts
         const channel = supabase
-            .channel("sos-realtime")
+            .channel("sos_data_changes")
             .on("postgres_changes", { event: "INSERT", schema: "public", table: "sos" }, async (payload) => {
                 const sos = payload.new as SosWithLocation;
                 const createdAt = new Date(sos.created_at);
@@ -131,6 +132,7 @@ export default function SosTable() {
                     sos.longitude = gpsRows[0].longitude;
                 }
 
+                toast.error("Vision+ User is in Danger!!!");
                 // Prepend new SOS entry
                 setData((prev) => [sos, ...prev]);
             })

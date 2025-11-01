@@ -66,7 +66,6 @@ export default function MyMap() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "gps_data" },
         (payload) => {
-          console.log("Change received!", payload);
           const newData = payload.new as GpsData;
           if (newData.latitude && newData.longitude) {
             setPosition({ lat: newData.latitude, lng: newData.longitude });
