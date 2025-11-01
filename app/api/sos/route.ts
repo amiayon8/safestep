@@ -22,7 +22,7 @@ export async function POST(req: Request) {
                 app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
                 headings: { en: "SOS Alert!!" },
                 contents: { en: "Vision+ User is in Danger!!!" },
-                url: "https://thenicedev.xyz", // optional link
+                url: "https://safestep.thenicedev.xyz", // optional link
                 included_segments: ["All"], // send to all users
             }),
         });

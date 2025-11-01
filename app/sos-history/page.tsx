@@ -66,8 +66,81 @@ export default function SosTable() {
             setLoading(false);
         };
 
+
+
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+
+            const { data: sosData } = await supabase
+                .from("sos")
+                .select("id, created_at")
+                .order("created_at", { ascending: false });
+
+            if (!sosData) return setLoading(false);
+
+            const enrichedData: SosWithLocation[] = await Promise.all(
+                sosData.map(async (sos) => {
+                    const createdAt = new Date(sos.created_at);
+                    const minTime = new Date(createdAt.getTime() - 5 * 60 * 1000).toISOString();
+                    const maxTime = new Date(createdAt.getTime() + 5 * 60 * 1000).toISOString();
+
+                    const { data: gpsRows } = await supabase
+                        .from("gps_data")
+                        .select("latitude, longitude, created_at")
+                        .gte("created_at", minTime)
+                        .lte("created_at", maxTime)
+                        .order("created_at", { ascending: true })
+                        .limit(1);
+
+                    return gpsRows?.length
+                        ? { ...sos, latitude: gpsRows[0].latitude, longitude: gpsRows[0].longitude }
+                        : sos;
+                })
+            );
+
+            setData(enrichedData);
+            setLoading(false);
+        };
+
+        fetchData();
+
+        // Subscribe to realtime SOS inserts
+        const channel = supabase
+            .channel("sos-realtime")
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "sos" }, async (payload) => {
+                const sos = payload.new as SosWithLocation;
+                const createdAt = new Date(sos.created_at);
+
+                const minTime = new Date(createdAt.getTime() - 5 * 60 * 1000).toISOString();
+                const maxTime = new Date(createdAt.getTime() + 5 * 60 * 1000).toISOString();
+
+                const { data: gpsRows } = await supabase
+                    .from("gps_data")
+                    .select("latitude, longitude, created_at")
+                    .gte("created_at", minTime)
+                    .lte("created_at", maxTime)
+                    .order("created_at", { ascending: true })
+                    .limit(1);
+
+                if (gpsRows?.length) {
+                    sos.latitude = gpsRows[0].latitude;
+                    sos.longitude = gpsRows[0].longitude;
+                }
+
+                // Prepend new SOS entry
+                setData((prev) => [sos, ...prev]);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
+
 
     return (
         <div className="mx-4 lg:mx-6 my-4 md:my-6">
@@ -76,7 +149,7 @@ export default function SosTable() {
                     <CardTitle>SOS History</CardTitle>
                     <CardDescription>List of all SOS alerts triggered with nearest location.</CardDescription>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
+                <CardContent className="max-w-[90vw] overflow-x-auto">
                     {loading ? (
                         <LoadingItems />
                     ) : (
