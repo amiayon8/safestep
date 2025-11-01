@@ -21,7 +21,7 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
                 headings: { en: "SOS Alert!!" },
-                contents: { en: "SafeStep User is in Danger!!!" },
+                contents: { en: "Vision+ User is in Danger!!!" },
                 url: "https://thenicedev.xyz", // optional link
                 included_segments: ["All"], // send to all users
             }),

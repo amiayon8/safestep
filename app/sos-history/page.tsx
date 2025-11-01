@@ -76,7 +76,7 @@ export default function SosTable() {
                     <CardTitle>SOS History</CardTitle>
                     <CardDescription>List of all SOS alerts triggered with nearest location.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-auto">
                     {loading ? (
                         <LoadingItems />
                     ) : (
