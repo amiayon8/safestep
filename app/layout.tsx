@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import SosToast from "./sos-toast";
 import "./globals.css";
 import ProgressLoader from "./client"
 import OneSignalInit from "@/components/OneSignalInit";
@@ -30,6 +30,7 @@ export default function RootLayout({
         className={`${openSans.variable} antialiased`}
       >
         <ThemeProvider>
+          <SosToast />
           <ProgressLoader />
           <Preloader />
           <Toaster />
