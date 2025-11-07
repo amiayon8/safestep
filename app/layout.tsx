@@ -15,8 +15,8 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Vision+ - For The Love of Walking",
-  description: "Vision+ is a student-driven innovation project from Rajuk Uttara Model College, Bangladesh, focusing on assistive technologies for persons with disabilities. Our vision is to use affordable embedded systems to improve accessibility and mobility for visually impaired individuals. With expertise in Arduino development, IoT integration, and human-centered design, we aim to bridge the technology gap and create low-cost, scalable solutions that positively impact society.",
+  title: "SafeStep - For The Love of Walking",
+  description: "SafeStep is a student-driven innovation project from Rajuk Uttara Model College, Bangladesh, focusing on assistive technologies for persons with disabilities. Our vision is to use affordable embedded systems to improve accessibility and mobility for visually impaired individuals. With expertise in Arduino development, IoT integration, and human-centered design, we aim to bridge the technology gap and create low-cost, scalable solutions that positively impact society.",
 };
 
 export default function RootLayout({

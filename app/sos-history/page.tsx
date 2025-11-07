@@ -132,7 +132,7 @@ export default function SosTable() {
                     sos.longitude = gpsRows[0].longitude;
                 }
 
-                toast.error("Vision+ User is in Danger!!!");
+                toast.error("SafeStep User is in Danger!!!");
                 // Prepend new SOS entry
                 setData((prev) => [sos, ...prev]);
             })

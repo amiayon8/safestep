@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export default function Footer({ className = "" }: React.ComponentProps<"div">) {
     return (
         <div className={cn("block bg-card shadow-sm mx-4 lg:mx-6 mt-auto py-3 border rounded-xl rounded-b-none w-auto text-muted-foreground text-xs md:text-sm text-center tracking-wide", className)}>
-            © {new Date().getFullYear()} <span className="font-medium text-primary">Vision+</span>.{" "}
+            © {new Date().getFullYear()} <span className="font-medium text-primary">SafeStep</span>.{" "}
             Developed by{" "}
             <Link
                 href="https://thenicedev.xyz"

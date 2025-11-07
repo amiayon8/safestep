@@ -78,7 +78,7 @@ export default function Sidebar({
           className="top-0 left-0 z-50 fixed flex flex-col bg-sidebar shadow-lg w-72 h-[100dvh] text-sidebar-foreground"
         >
           <div className="flex justify-between items-center p-4 font-logo font-bold text-xl">
-            <span>Vision+</span>
+            <span>SafeStep</span>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="sm:hidden hover:bg-primary/10 px-3 py-2 rounded-lg text-foreground"

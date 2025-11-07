@@ -14,7 +14,7 @@ export default function SosToast() {
                 "postgres_changes",
                 { event: "INSERT", schema: "public", table: "sos" },
                 () => {
-                    toast.error("Vision+ User is in Danger!");
+                    toast.error("SafeStep User is in Danger!");
                 }
             )
             .subscribe();
