@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  IconHeartbeat,
   IconAlertHexagonFilled,
   IconLiveViewFilled,
   IconMapPinFilled,
@@ -45,7 +46,8 @@ export default function Sidebar({
   }, []);
 
   const sidebarItems = [
-    { name: "Live Location", icon: IconLiveViewFilled, url: "/" },
+    { name: "Dashboard", icon: IconHeartbeat, url: "/" },
+    { name: "Live Location", icon: IconLiveViewFilled, url: "/live-location" },
     { name: "Location History", icon: IconMapPinFilled, url: "/history" },
     { name: "SOS History", icon: IconAlertHexagonFilled, url: "/sos-history" },
   ];
@@ -75,7 +77,7 @@ export default function Sidebar({
           initial={{ x: "0%" }}
           animate={{ x: isOpen ? 0 : "-100%" }}
           transition={{ type: "tween", duration: 0.3 }}
-          className="top-0 left-0 z-50 fixed flex flex-col bg-sidebar shadow-lg w-72 h-[100dvh] text-sidebar-foreground"
+          className="top-0 left-0 z-50 fixed flex flex-col bg-sidebar shadow-lg w-72 h-dvh text-sidebar-foreground"
         >
           <div className="flex justify-between items-center p-4 font-logo font-bold text-xl">
             <span>SafeStep</span>
@@ -87,7 +89,7 @@ export default function Sidebar({
             </button>
           </div>
 
-          <nav className="flex flex-col gap-1 py-6 min-w-[240px] overflow-auto font-sans font-normal text-base">
+          <nav className="flex flex-col gap-1 py-6 min-w-60 overflow-auto font-sans font-normal text-base">
             {sidebarItems.map(({ name, icon: Icon, url }) => {
               const active =
                 pathname === url || (url !== "/" && pathname.startsWith(url));
