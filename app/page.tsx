@@ -1,13 +1,17 @@
 import DashStats from "@/components/dash-stats"
-import DashHeartHistory from "@/components/dash-heart-history"
+import DashHeartHistory from "@/components/dash-health-status"
+import DashLiveLocation from "@/components/dash-live-location"
 
 export default function Page() {
     return (
-        <main className="p-6 min-h-dvh">
+        <section className="px-6 pt-6 pb-12 min-h-dvh">
             <div className="gap-3 grid grid-cols-6">
-                <DashStats className="col-span-4" />
+                <div className="space-y-3 col-span-4">
+                    <DashStats className="col-span-4" />
+                    <DashLiveLocation />
+                </div>
                 <DashHeartHistory className="col-span-2" />
             </div>
-        </main>
+        </section>
     )
 }

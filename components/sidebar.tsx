@@ -133,8 +133,8 @@ export default function Sidebar({
 
           <main className="flex flex-col flex-1 h-full overflow-auto">
             {children}
-            <Footer />
           </main>
+          <Footer />
         </motion.div>
       </div >
     </>
