@@ -6,8 +6,14 @@ import { HealthStatusGraph } from "./dash-health-status-graph";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
+function getRandomInt(min: number, max: number): number {
+    const minInt = Math.ceil(min);
+    const maxInt = Math.floor(max);
+    return Math.floor(Math.random() * (maxInt - minInt)) + minInt;
+}
+
 export default function DashStats({ className, ...props }: React.ComponentProps<"div">) {
-    let condition = 1;
+    const condition = getRandomInt(0, 3); // 0: Normal, 1: Good, 2: Poor
 
     return (
         <div className={cn("font-nimbus", className)} {...props}>

@@ -1,13 +1,18 @@
 import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card";
 import { IconHeartRateMonitor, IconBaselineDensityMedium, IconTrendingUp2, IconTrendingDown2, IconArrowsDiagonal } from "@tabler/icons-react";
-import { cn } from "@/lib/utils"
 import { HealthStatusGraph } from "./health-status-graph";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+function getRandomInt(min: number, max: number): number {
+    const minInt = Math.ceil(min);
+    const maxInt = Math.floor(max);
+    return Math.floor(Math.random() * (maxInt - minInt)) + minInt;
+}
+
 export default function Page() {
-    let condition = 1;
+    const condition = getRandomInt(0, 3); // 0: Normal, 1: Good, 2: Poor
 
     return (
         <div className="px-6 pt-6 pb-12 min-h-dvh font-nimbus">
