@@ -70,7 +70,7 @@ export default function DashStats({ className, ...props }: React.ComponentProps<
                         </div>
                     )}
 
-                    <div className="flex flex-row justify-between items-start mt-5">
+                    <div className="flex flex-row flex-wrap justify-between items-start gap-x-1 gap-y-4 mt-5">
                         <div className="flex-row justify-start items-start">
                             <div className="flex flex-row justify-start items-center gap-1">
                                 <span className="bg-primary p-1 rounded-full aspect-square text-primary-foreground">
