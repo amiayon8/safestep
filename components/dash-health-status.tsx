@@ -16,7 +16,7 @@ export default function DashStats({ className, ...props }: React.ComponentProps<
     const condition = getRandomInt(0, 3); // 0: Normal, 1: Good, 2: Poor
 
     return (
-        <div className={cn("font-nimbus", className)} {...props}>
+        <div className={cn("w-full font-nimbus", className)} {...props}>
             <Card>
                 <CardContent className="space-y-2">
                     <div className="flex flex-row justify-between items-center">
