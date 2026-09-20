@@ -8,6 +8,7 @@ import {
   IconAlertHexagonFilled,
   IconLiveViewFilled,
   IconMapPinFilled,
+  IconRoute,
   IconMenu2,
   IconX,
 } from "@tabler/icons-react";
@@ -15,12 +16,7 @@ import Link from "next/link";
 import Footer from "@/components/footer";
 import ThemeToggle from "./theme-toggle";
 
-
-export default function Sidebar({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // closed by default on mobile
@@ -60,7 +56,10 @@ export default function Sidebar({
           <div className="bg-background/50 mb-4 rounded-md w-3/4 h-10"></div>
           <div className="flex flex-col gap-2">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-background/50 rounded-md w-full h-8"></div>
+              <div
+                key={i}
+                className="bg-background/50 rounded-md w-full h-8"
+              ></div>
             ))}
           </div>
         </div>
@@ -98,10 +97,11 @@ export default function Sidebar({
                 <Link
                   key={url}
                   href={url}
-                  className={`flex items-center gap-3 px-6 py-4 transition-colors text-sm ${active
-                    ? "bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
-                    : "hover:bg-background/50"
-                    }`}
+                  className={`flex items-center gap-3 px-6 py-4 transition-colors text-sm ${
+                    active
+                      ? "bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+                      : "hover:bg-background/50"
+                  }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span>{name}</span>
@@ -121,8 +121,9 @@ export default function Sidebar({
           <header className="flex justify-between items-center bg-sidebar shadow-sm px-4 h-14 text-sidebar-foreground">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`hover:bg-primary/10 px-3 py-2 rounded-lg text-foreground ${isOpen ? "hidden" : "block"
-                } sm:block`}
+              className={`hover:bg-primary/10 px-3 py-2 rounded-lg text-foreground ${
+                isOpen ? "hidden" : "block"
+              } sm:block`}
             >
               <IconMenu2 />
             </button>
@@ -136,7 +137,7 @@ export default function Sidebar({
           </main>
           <Footer />
         </motion.div>
-      </div >
+      </div>
     </>
   );
 }
