@@ -9,7 +9,7 @@ export default function SosToast() {
 
     useEffect(() => {
         const channel = supabase
-            .channel("sos_data_changes")
+            .channel("sos_toast_changes")
             .on(
                 "postgres_changes",
                 { event: "INSERT", schema: "public", table: "sos" },

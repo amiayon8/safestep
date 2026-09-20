@@ -63,9 +63,8 @@ export default function DashLiveLocation() {
 
         fetchLastPosition();
 
-        // Subscribe to realtime changes
         const channel = supabase
-            .channel("gps_data_changes")
+            .channel("dash_live_location_gps")
             .on(
                 "postgres_changes",
                 { event: "INSERT", schema: "public", table: "gps_data" },

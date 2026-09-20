@@ -109,9 +109,8 @@ export default function SosTable() {
 
         fetchData();
 
-        // Subscribe to realtime SOS inserts
         const channel = supabase
-            .channel("sos_data_changes")
+            .channel("sos_history_changes")
             .on("postgres_changes", { event: "INSERT", schema: "public", table: "sos" }, async (payload) => {
                 const sos = payload.new as SosWithLocation;
                 const createdAt = new Date(sos.created_at);

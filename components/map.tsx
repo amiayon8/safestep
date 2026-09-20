@@ -59,9 +59,8 @@ export default function MyMap() {
 
     fetchLastPosition();
 
-    // Subscribe to realtime changes
     const channel = supabase
-      .channel("gps_data_changes")
+      .channel("live_map_gps_changes")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "gps_data" },
