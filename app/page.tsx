@@ -1,5 +1,4 @@
 import DashStats from "@/components/dash-stats"
-import DashHeartHistory from "@/components/dash-health-status"
 import DashLiveLocation from "@/components/dash-live-location"
 
 export default function Page() {

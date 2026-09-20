@@ -639,8 +639,14 @@ export default function KmlImporter() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [rawKmlInput, setRawKmlInput] = useState("");
-  const [steps, setSteps] = useState<KmlStep[]>([]);
+  const [rawKmlInput, setRawKmlInput] = useState(sampleKmlPreset);
+  const [steps, setSteps] = useState<KmlStep[]>(() => {
+    try {
+      return parseKmlCoordinates(sampleKmlPreset);
+    } catch {
+      return [];
+    }
+  });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -661,16 +667,6 @@ export default function KmlImporter() {
 
   const stepListRef = useRef<HTMLDivElement>(null);
   const activeStepItemRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    try {
-      const parsedSteps = parseKmlCoordinates(sampleKmlPreset);
-      setSteps(parsedSteps);
-      setRawKmlInput(sampleKmlPreset);
-    } catch {
-      setSteps([]);
-    }
-  }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

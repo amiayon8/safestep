@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "./ui/card";
-import { IconHeartbeat, IconLeaf, IconRun } from "@tabler/icons-react";
+import { IconHeartbeat, IconLeaf } from "@tabler/icons-react";
 import { cn } from "@/lib/utils"
 import { createClient } from "@/utils/supabase/client";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -8,7 +8,6 @@ import {
   IconAlertHexagonFilled,
   IconLiveViewFilled,
   IconMapPinFilled,
-  IconRoute,
   IconMenu2,
   IconX,
 } from "@tabler/icons-react";
@@ -16,18 +15,14 @@ import Link from "next/link";
 import Footer from "@/components/footer";
 import ThemeToggle from "./theme-toggle";
 
+const emptySubscribe = () => () => {};
+
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
-  // closed by default on mobile
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // track client mount to avoid hydration mismatch
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
-
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsOpen(true);
